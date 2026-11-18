@@ -1,0 +1,89 @@
+{
+  "set": "Zero Optiks Leica R",
+  "flip": false,
+  "lenses": [
+    {
+      "f": "19mm",
+      "t": "T3",
+      "cf": "1'",
+      "d": "95mm"
+    },
+    {
+      "f": "24mm",
+      "t": "T3",
+      "cf": "1'",
+      "d": "95mm"
+    },
+    {
+      "f": "28mm",
+      "t": "T3",
+      "cf": "1'",
+      "d": "95mm"
+    },
+    {
+      "f": "35mm",
+      "t": "T1.6",
+      "cf": "1' 8\"",
+      "d": "95mm"
+    },
+    {
+      "f": "50mm",
+      "t": "T1.5",
+      "cf": "1'",
+      "d": "95mm"
+    },
+    {
+      "f": "60mm",
+      "t": "T2.9",
+      "cf": "10' ¼\"",
+      "d": "95mm"
+    },
+    {
+      "f": "80mm",
+      "t": "T1.5",
+      "cf": "1' 8\"",
+      "d": "95mm"
+    },
+    {
+      "f": "90mm",
+      "t": "T2.1",
+      "cf": "2'",
+      "d": "95mm"
+    },
+    {
+      "f": "100mm",
+      "t": "T2.9",
+      "cf": "17\"",
+      "d": "95mm"
+    },
+    {
+      "f": "135mm",
+      "t": "T2.9",
+      "cf": "2' 11\"",
+      "d": "95mm"
+    }
+  ],
+  "crew": [
+    {
+      "role": "DP",
+      "name": "Alexandra Montgomery-Smith",
+      "phone": "+44 7000 000000"
+    },
+    {
+      "role": "1st AC",
+      "name": "Name",
+      "phone": "+44 7000 000000"
+    },
+    {
+      "role": "2nd AC",
+      "name": "Name",
+      "phone": "+44 7000 000000"
+    },
+    {
+      "role": "Gaffer",
+      "name": "Name",
+      "phone": "+44 7000 000000"
+    }
+  ],
+  "notes": "Call 07:00 at unit base.\n\nB-cam on the 24-70 for the car rig. Filters: 1/8 BPM on everything outdoors, ND.9 ready."
+}
