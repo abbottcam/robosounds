@@ -23,11 +23,13 @@ constexpr uint8_t WHITE = 15;
 
 // fb is the library-format framebuffer (960*540/2 bytes, 4 bits per pixel).
 // flip rotates the picture 180 degrees (USB port at the other end).
-void begin(uint8_t *fb, bool flip);
+// invert draws white on black.
+void begin(uint8_t *fb, bool flip, bool invert = false);
 void clear(uint8_t shade = WHITE);
 
 void pixel(int x, int y, uint8_t shade);
 uint8_t getPixel(int x, int y);
+uint8_t screenPixel(int x, int y);  // what the panel will show (after invert)
 void fillRect(int x, int y, int w, int h, uint8_t shade);
 void hline(int x, int y, int w, int t, uint8_t shade = BLACK);
 void vline(int x, int y, int h, int t, uint8_t shade = BLACK);

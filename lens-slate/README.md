@@ -29,6 +29,10 @@ The "user button" is the one that isn't RST or BOOT: GPIO21 on the S3 board, GPI
 The screen is used **portrait** (540 × 960). If it ends up upside down on your rig, tick
 **Flip screen upside down** on the edit page.
 
+Tick **White text on black** on the edit page for the inverted look:
+
+![Inverted screens](docs/screens_inverted.png)
+
 ## Building
 
 1. Install [PlatformIO](https://platformio.org/install) (the VS Code extension is easiest).

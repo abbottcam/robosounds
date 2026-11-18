@@ -48,6 +48,7 @@ static const char WEB_PAGE[] PROGMEM = R"rawliteral(<!doctype html>
   <h2>LENS SET NAME</h2>
   <input id="set" maxlength="40" placeholder="Zero Optiks Leica R">
   <label class="chk"><input type="checkbox" id="flip"> Flip screen upside down</label>
+  <label class="chk"><input type="checkbox" id="invert"> White text on black</label>
 </div>
 
 <div class="card">
@@ -137,6 +138,7 @@ function collect() {
   return {
     set: clean($('set').value).trim(),
     flip: $('flip').checked,
+    invert: $('invert').checked,
     lenses: [...$('lenses').children].map(vals)
       .filter(v => v[0]).map(([f, t, cf, d]) => ({ f, t, cf: fractions(cf), d })),
     crew: [...$('crew').children].map(vals)
@@ -172,6 +174,7 @@ $('save').onclick = async () => {
 fetch('/data').then(r => r.json()).then(d => {
   $('set').value = d.set || '';
   $('flip').checked = !!d.flip;
+  $('invert').checked = !!d.invert;
   (d.lenses || []).forEach(addLens);
   (d.crew || []).forEach(addCrew);
   $('notes').value = d.notes || '';

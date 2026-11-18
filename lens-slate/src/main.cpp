@@ -67,6 +67,7 @@ static void loadDefaults() {
   config.clear();
   config["set"] = "Zero Optiks Leica R";
   config["flip"] = false;
+  config["invert"] = false;
   JsonArray lenses = config["lenses"].to<JsonArray>();
   const char *demo[][3] = {
       {"19mm", "T3", "1'"},       {"24mm", "T3", "1'"},
@@ -123,6 +124,7 @@ static bool sanitizeInto(JsonDocument &in, JsonDocument &out) {
   out.clear();
   out["set"] = clip(in["set"] | "", MAX_FIELD_CHARS);
   out["flip"] = in["flip"] | false;
+  out["invert"] = in["invert"] | false;
 
   JsonArray lensesOut = out["lenses"].to<JsonArray>();
   for (JsonObject l : in["lenses"].as<JsonArray>()) {
@@ -182,7 +184,7 @@ static void pushToScreen() {
 static void showPage(uint8_t page) {
   epd_poweron();
   String battery = batteryLabel();
-  gfx::begin(framebuffer, config["flip"] | false);
+  gfx::begin(framebuffer, config["flip"] | false, config["invert"] | false);
   renderPage(page, config, battery.c_str(), showFirstRunHint);
   pushToScreen();
   epd_poweroff_all();
@@ -237,7 +239,7 @@ static String apPassword() {
 
 static void showEditScreen(const String &ssid, const String &pass) {
   epd_poweron();
-  gfx::begin(framebuffer, config["flip"] | false);
+  gfx::begin(framebuffer, config["flip"] | false, config["invert"] | false);
   renderEditScreen(ssid.c_str(), pass.c_str());
   pushToScreen();
   epd_poweroff_all();

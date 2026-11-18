@@ -14,16 +14,19 @@ namespace gfx {
 
 static uint8_t *buf = nullptr;
 static bool flipped = false;
+static bool inverted = false;
 
 static const int PHYS_W = 960;
 static const int PHYS_H = 540;
 
-void begin(uint8_t *fb, bool flip) {
+void begin(uint8_t *fb, bool flip, bool invert) {
   buf = fb;
   flipped = flip;
+  inverted = invert;
 }
 
 void clear(uint8_t shade) {
+  if (inverted) shade = 15 - shade;
   uint8_t v = (shade & 0x0F) | (shade << 4);
   memset(buf, v, PHYS_W * PHYS_H / 2);
 }
@@ -44,6 +47,7 @@ static inline bool toPhys(int x, int y, int &px, int &py) {
 void pixel(int x, int y, uint8_t shade) {
   int px, py;
   if (!toPhys(x, y, px, py)) return;
+  if (inverted) shade = 15 - shade;
   uint8_t *p = &buf[py * (PHYS_W / 2) + px / 2];
   if (px & 1) *p = (*p & 0x0F) | (shade << 4);
   else *p = (*p & 0xF0) | (shade & 0x0F);
@@ -53,7 +57,13 @@ uint8_t getPixel(int x, int y) {
   int px, py;
   if (!toPhys(x, y, px, py)) return WHITE;
   uint8_t v = buf[py * (PHYS_W / 2) + px / 2];
-  return (px & 1) ? (v >> 4) : (v & 0x0F);
+  uint8_t s = (px & 1) ? (v >> 4) : (v & 0x0F);
+  return inverted ? 15 - s : s;
+}
+
+uint8_t screenPixel(int x, int y) {
+  uint8_t s = getPixel(x, y);
+  return inverted ? 15 - s : s;
 }
 
 void fillRect(int x, int y, int w, int h, uint8_t shade) {

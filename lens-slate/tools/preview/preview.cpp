@@ -14,7 +14,7 @@ static void savePgm(const std::string &path) {
   std::ofstream out(path, std::ios::binary);
   out << "P5\n" << gfx::W << " " << gfx::H << "\n255\n";
   for (int y = 0; y < gfx::H; y++)
-    for (int x = 0; x < gfx::W; x++) out.put((char)(gfx::getPixel(x, y) * 17));
+    for (int x = 0; x < gfx::W; x++) out.put((char)(gfx::screenPixel(x, y) * 17));
 }
 
 int main(int argc, char **argv) {
@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
   if (deserializeJson(config, ss.str())) return 2;
 
   std::vector<uint8_t> fb(EPD_WIDTH * EPD_HEIGHT / 2);
-  gfx::begin(fb.data(), config["flip"] | false);
+  gfx::begin(fb.data(), config["flip"] | false, config["invert"] | false);
   std::string dir = argv[2];
   const char *names[] = {"lens", "crew", "notes"};
   for (int p = 0; p < PAGE_COUNT; p++) {
