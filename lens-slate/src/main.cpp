@@ -1,5 +1,5 @@
 // Lens Slate: an e-paper lens chart, crew list and notes screen for the
-// camera body, running on a LilyGo T5 4.7" e-paper board.
+// camera body, running on LilyGo T5 4.7" e-paper boards (see board.h).
 //
 // How it behaves:
 //   * The board spends almost all of its time in deep sleep. The e-paper keeps
@@ -20,11 +20,8 @@
 #include <LittleFS.h>
 #include <WebServer.h>
 #include <WiFi.h>
-#include <driver/rtc_io.h>
 
-#include "epd_driver.h"
-#include "utilities.h"
-
+#include "board.h"
 #include "gfx.h"
 #include "render.h"
 #include "web_page.h"
@@ -158,54 +155,22 @@ static bool saveConfig() {
 }
 
 // ---------------------------------------------------------------------------
-// Battery
+// Display / sleep
 // ---------------------------------------------------------------------------
-
-// Must be called after epd_poweron(): the battery divider is switched by the
-// display power rail.
-static String batteryLabel() {
-  delay(10);
-  uint32_t mv = analogReadMilliVolts(BATT_PIN) * 2;  // 1:2 divider on the board
-  if (mv > 4350) return "USB";
-  if (mv < 3000) return "LOW";
-  int pct = constrain(map((long)mv, 3300, 4150, 0, 100), 0, 100);
-  return String(pct) + "%";
-}
-
-// ---------------------------------------------------------------------------
-// Display
-// ---------------------------------------------------------------------------
-
-static void pushToScreen() {
-  epd_clear();
-  epd_draw_grayscale_image(epd_full_screen(), framebuffer);
-}
 
 static void showPage(uint8_t page) {
-  epd_poweron();
-  String battery = batteryLabel();
+  String battery = boardBattery();
   gfx::begin(framebuffer, config["flip"] | false, config["invert"] | false);
   renderPage(page, config, battery.c_str(), showFirstRunHint);
-  pushToScreen();
-  epd_poweroff_all();
+  boardShow(framebuffer);
 }
-
-// ---------------------------------------------------------------------------
-// Sleep / button
-// ---------------------------------------------------------------------------
 
 static void goToSleep() {
-  epd_poweroff_all();
   WiFi.mode(WIFI_OFF);
-#if defined(CONFIG_IDF_TARGET_ESP32S3)
-  rtc_gpio_pullup_en((gpio_num_t)BUTTON_1);
-  rtc_gpio_pulldown_dis((gpio_num_t)BUTTON_1);
-#endif
-  esp_sleep_enable_ext0_wakeup((gpio_num_t)BUTTON_1, 0);  // button pulls low
-  esp_deep_sleep_start();
+  boardSleep();
 }
 
-static bool buttonDown() { return digitalRead(BUTTON_1) == LOW; }
+static bool buttonDown() { return digitalRead(boardButtonPin()) == LOW; }
 
 // Returns true if the button is held for HOLD_FOR_EDIT_MS.
 static bool heldForEdit() {
@@ -238,11 +203,9 @@ static String apPassword() {
 }
 
 static void showEditScreen(const String &ssid, const String &pass) {
-  epd_poweron();
   gfx::begin(framebuffer, config["flip"] | false, config["invert"] | false);
   renderEditScreen(ssid.c_str(), pass.c_str());
-  pushToScreen();
-  epd_poweroff_all();
+  boardShow(framebuffer);
 }
 
 static void finishEditMode(bool saved) {
@@ -327,16 +290,13 @@ static void startEditMode() {
 void setup() {
   Serial.begin(115200);
 
-  // After a wake from deep sleep the button pin is still an RTC pin.
-  rtc_gpio_deinit((gpio_num_t)BUTTON_1);
-  pinMode(BUTTON_1, INPUT_PULLUP);
+  boardBegin();
 
-  framebuffer = (uint8_t *)ps_calloc(1, EPD_WIDTH * EPD_HEIGHT / 2);
+  framebuffer = (uint8_t *)ps_calloc(1, gfx::FB_BYTES);
   if (!framebuffer) {
     Serial.println("PSRAM allocation failed");
     while (true) delay(1000);
   }
-  epd_init();
 
   if (!LittleFS.begin(true)) Serial.println("LittleFS mount failed");
   if (!loadConfig()) {

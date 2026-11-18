@@ -8,10 +8,10 @@
 // Fonts that come with the LilyGo library. FiraSans also has Latin-1
 // characters such as ¼ ½ ¾ Ø and accented letters; the Roboto fonts are
 // plain ASCII.
-#include "firasans.h"
-#include "roboto12.h"
-#include "roboto18.h"
-#include "roboto32.h"
+#include "fonts/firasans.h"
+#include "fonts/roboto12.h"
+#include "fonts/roboto18.h"
+#include "fonts/roboto32.h"
 
 using namespace gfx;
 

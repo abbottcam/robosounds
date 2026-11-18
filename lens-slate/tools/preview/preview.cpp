@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
   JsonDocument config;
   if (deserializeJson(config, ss.str())) return 2;
 
-  std::vector<uint8_t> fb(EPD_WIDTH * EPD_HEIGHT / 2);
+  std::vector<uint8_t> fb(gfx::FB_BYTES);
   gfx::begin(fb.data(), config["flip"] | false, config["invert"] | false);
   std::string dir = argv[2];
   const char *names[] = {"lens", "crew", "notes"};

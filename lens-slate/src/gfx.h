@@ -8,12 +8,18 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "epd_driver.h"  // GFXfont / GFXglyph types
+#include "fonts/font_types.h"
 
 namespace gfx {
 
 constexpr int W = 540;
 constexpr int H = 960;
+
+// Framebuffer: the panel's native 960 x 540 landscape layout, 4 bits per
+// pixel, two pixels per byte (even x in the low nibble).
+constexpr int FB_WIDTH = 960;
+constexpr int FB_HEIGHT = 540;
+constexpr int FB_BYTES = FB_WIDTH * FB_HEIGHT / 2;
 
 constexpr uint8_t BLACK = 0;
 constexpr uint8_t DARK = 5;

@@ -4,10 +4,26 @@
 #include <stdlib.h>
 #include <string.h>
 
+// The font bitmaps are zlib-compressed. On the board we use the decompressor
+// built into the ESP32's ROM; on a computer (previews) we use zlib.
 #ifdef SLATE_HOST_PREVIEW
 #include <zlib.h>
+static bool inflateBitmap(uint8_t *dst, unsigned long dstLen, const uint8_t *src,
+                          unsigned long srcLen) {
+  return uncompress(dst, &dstLen, src, srcLen) == Z_OK;
+}
 #else
-#include "zlib/zlib.h"  // bundled with the LilyGo library
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+#include "esp32s3/rom/miniz.h"
+#else
+#include "esp32/rom/miniz.h"
+#endif
+static bool inflateBitmap(uint8_t *dst, unsigned long dstLen, const uint8_t *src,
+                          unsigned long srcLen) {
+  size_t n = tinfl_decompress_mem_to_mem(dst, dstLen, src, srcLen,
+                                         TINFL_FLAG_PARSE_ZLIB_HEADER);
+  return n != TINFL_DECOMPRESS_MEM_TO_MEM_FAILED;
+}
 #endif
 
 namespace gfx {
@@ -16,8 +32,8 @@ static uint8_t *buf = nullptr;
 static bool flipped = false;
 static bool inverted = false;
 
-static const int PHYS_W = 960;
-static const int PHYS_H = 540;
+static const int PHYS_W = FB_WIDTH;
+static const int PHYS_H = FB_HEIGHT;
 
 void begin(uint8_t *fb, bool flip, bool invert) {
   buf = fb;
@@ -136,7 +152,10 @@ static void drawGlyph(const GFXfont *font, const GFXglyph *g, int x, int y, uint
     bitmap = (uint8_t *)malloc(size);
     if (!bitmap) return;
     allocated = true;
-    uncompress(bitmap, &size, &font->bitmap[g->data_offset], g->compressed_size);
+    if (!inflateBitmap(bitmap, size, &font->bitmap[g->data_offset], g->compressed_size)) {
+      free(bitmap);
+      return;
+    }
   } else {
     bitmap = &font->bitmap[g->data_offset];
   }
