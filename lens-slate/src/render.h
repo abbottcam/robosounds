@@ -5,7 +5,13 @@
 #include <ArduinoJson.h>
 #include <stdint.h>
 
-enum Page : uint8_t { PAGE_LENS = 0, PAGE_CREW = 1, PAGE_NOTES = 2, PAGE_COUNT = 3 };
+enum Page : uint8_t {
+  PAGE_LENS = 0,
+  PAGE_CAST = 1,
+  PAGE_CREW = 2,
+  PAGE_NOTES = 3,
+  PAGE_COUNT = 4
+};
 
 // Draws a full page into the framebuffer given to gfx::begin().
 void renderPage(uint8_t page, JsonDocument &config, const char *battery, bool firstRunHint);

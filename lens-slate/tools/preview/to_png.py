@@ -4,7 +4,7 @@ from pathlib import Path
 from PIL import Image, ImageOps
 
 out = Path(sys.argv[1])
-names = ["lens", "crew", "notes", "edit"]
+names = ["lens", "cast", "crew", "notes", "edit"]
 imgs = [Image.open(out / f"{n}.pgm").convert("L") for n in names]
 for n, im in zip(names, imgs):
     im.save(out / f"{n}.png")

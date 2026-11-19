@@ -2,7 +2,7 @@
 
 A DIY e-paper lens chart for the camera body, built on the **LilyGo T5 4.7" S3 E-Paper Pro**
 (the version with a case and built-in battery). It also builds for the plain T5 4.7" boards.
-It has three pages: **Lens**, **Crew** and **Notes**, and you edit everything from your phone over Wi-Fi.
+It has four pages: **Lens**, **Cast**, **Crew** and **Notes**, and you edit everything from your phone over Wi-Fi.
 You don't need an app.
 
 ![Screens](docs/screens.png)
@@ -12,12 +12,16 @@ When every lens has the same front diameter, Ø is shown once in a tall merged c
 If you leave Ø empty, that column disappears.
 Text can include ¼ ½ ¾, ' and ", so imperial close-focus marks work.
 
+The cast page ("runs and rides") is a table of **ID | Character | Cast**. Add a *gap* on the edit
+page to split it into groups, such as who's in which car. Long names wrap onto two lines, and the
+table switches to a narrower font if needed so names aren't cut off.
+
 ## Using it
 
 | Action | What happens |
 |---|---|
 | Power on / reset | Shows the Lens page, then sleeps |
-| Short press of the user button | Next page (Lens → Crew → Notes), then sleeps |
+| Short press of the button | Next page (Lens → Cast → Crew → Notes), then sleeps |
 | Hold the button for 3 s | **Edit mode**: the screen shows a Wi-Fi name and password |
 | In edit mode, join that Wi-Fi on your phone | The edit page pops up (or go to `http://192.168.4.1`) |
 | Tap **Save to slate** | The screen updates and goes back to sleep |

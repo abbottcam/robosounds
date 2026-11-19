@@ -27,6 +27,10 @@ static const char WEB_PAGE[] PROGMEM = R"rawliteral(<!doctype html>
   .chk { display:flex; gap:8px; align-items:center; margin-top:12px; color:var(--muted); font-size:15px; }
   .chk input { width:auto; }
   .crew { grid-template-columns: 1fr 1.5fr 1.5fr 34px; }
+  .cast { grid-template-columns: .6fr 1.5fr 1.8fr 34px; }
+  .gap { display:flex; align-items:center; gap:8px; margin:4px 0 10px; color:var(--muted); font-size:13px; }
+  .gap::before, .gap::after { content:""; flex:1; border-top:2px dashed var(--line); }
+  .two { display:flex; gap:8px; }
   .hdr { font-size:12px; color:var(--muted); margin-bottom:4px; }
   .x { border:0; background:transparent; color:var(--muted); font-size:22px; width:34px; height:38px; padding:0; }
   .add { border:1px dashed var(--line); background:transparent; color:var(--ink); border-radius:8px;
@@ -62,6 +66,17 @@ static const char WEB_PAGE[] PROGMEM = R"rawliteral(<!doctype html>
 </div>
 
 <div class="card">
+  <h2>CAST <span class="count" id="castCount"></span></h2>
+  <div class="row cast hdr"><span>ID</span><span>Character</span><span>Cast</span><span></span></div>
+  <div id="cast"></div>
+  <div class="two">
+    <button class="add" id="addCast">+ Add actor</button>
+    <button class="add" id="addGap">+ Add gap</button>
+  </div>
+  <p class="tip">A gap splits the list into groups, e.g. who's in which car.</p>
+</div>
+
+<div class="card">
   <h2>CREW <span class="count" id="crewCount"></span></h2>
   <div class="row crew hdr"><span>Role</span><span>Name</span><span>Phone</span><span></span></div>
   <div id="crew"></div>
@@ -79,7 +94,7 @@ static const char WEB_PAGE[] PROGMEM = R"rawliteral(<!doctype html>
 </div>
 
 <script>
-const MAX_LENSES = 12, MAX_CREW = 10;
+const MAX_LENSES = 12, MAX_CREW = 10, MAX_CAST = 14;
 const $ = id => document.getElementById(id);
 
 // The screen font has plain ASCII plus Latin-1 (so ¼ ½ ¾ Ø é etc. work).
@@ -125,12 +140,30 @@ function addCrew(c = {}) {
   $('crew').append(r); refreshCounts();
 }
 
+function addCast(c = {}) {
+  const r = document.createElement('div');
+  if (c.gap) {
+    r.className = 'gap'; r.dataset.gap = '1';
+    const label = document.createElement('span'); label.textContent = 'gap';
+    r.append(label, removeBtn(r));
+  } else {
+    r.className = 'row cast';
+    const actor = field(c.actor, 40, 'Actor name'); actor.autocapitalize = 'words';
+    const ch = field(c.character, 24, 'CHARACTER'); ch.autocapitalize = 'characters';
+    r.append(field(c.id, 4, '1'), ch, actor, removeBtn(r));
+  }
+  $('cast').append(r); refreshCounts();
+}
+
 function refreshCounts() {
   const nl = $('lenses').children.length, nc = $('crew').children.length;
   $('lensCount').textContent = nl + ' / ' + MAX_LENSES;
   $('crewCount').textContent = nc + ' / ' + MAX_CREW;
   $('addLens').disabled = nl >= MAX_LENSES;
   $('addCrew').disabled = nc >= MAX_CREW;
+  const na = $('cast').children.length;
+  $('castCount').textContent = na + ' / ' + MAX_CAST;
+  $('addCast').disabled = $('addGap').disabled = na >= MAX_CAST;
 }
 
 function collect() {
@@ -141,6 +174,11 @@ function collect() {
     invert: $('invert').checked,
     lenses: [...$('lenses').children].map(vals)
       .filter(v => v[0]).map(([f, t, cf, d]) => ({ f, t, cf: fractions(cf), d })),
+    cast: [...$('cast').children].map(r => {
+      if (r.dataset.gap) return { gap: true };
+      const [id, character, actor] = vals(r);
+      return (id || character || actor) ? { id, character, actor } : null;
+    }).filter(Boolean),
     crew: [...$('crew').children].map(vals)
       .filter(v => v[0] || v[1]).map(([role, name, phone]) => ({ role, name, phone })),
     notes: clean($('notes').value).replace(/\r/g, '').trim(),
@@ -149,6 +187,8 @@ function collect() {
 
 $('addLens').onclick = () => addLens();
 $('addCrew').onclick = () => addCrew();
+$('addCast').onclick = () => addCast();
+$('addGap').onclick = () => addCast({ gap: true });
 $('copyDia').onclick = () => {
   const rows = [...$('lenses').children];
   if (!rows.length) return;
@@ -176,6 +216,7 @@ fetch('/data').then(r => r.json()).then(d => {
   $('flip').checked = !!d.flip;
   $('invert').checked = !!d.invert;
   (d.lenses || []).forEach(addLens);
+  (d.cast || []).forEach(addCast);
   (d.crew || []).forEach(addCrew);
   $('notes').value = d.notes || '';
   refreshCounts();

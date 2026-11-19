@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> fb(gfx::FB_BYTES);
   gfx::begin(fb.data(), config["flip"] | false, config["invert"] | false);
   std::string dir = argv[2];
-  const char *names[] = {"lens", "crew", "notes"};
+  const char *names[] = {"lens", "cast", "crew", "notes"};
   for (int p = 0; p < PAGE_COUNT; p++) {
     renderPage(p, config, "82%", false);
     savePgm(dir + "/" + names[p] + ".pgm");

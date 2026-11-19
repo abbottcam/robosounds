@@ -85,5 +85,33 @@
       "phone": "+44 7000 000000"
     }
   ],
-  "notes": "Call 07:00 at unit base.\n\nB-cam on the 24-70 for the car rig. Filters: 1/8 BPM on everything outdoors, ND.9 ready."
+  "notes": "Call 07:00 at unit base.\n\nB-cam on the 24-70 for the car rig. Filters: 1/8 BPM on everything outdoors, ND.9 ready.",
+  "cast": [
+    {
+      "id": "2",
+      "character": "SAMANTHA",
+      "actor": "Actor Name"
+    },
+    {
+      "gap": true
+    },
+    {
+      "id": "1",
+      "character": "SAM",
+      "actor": "Actor Name"
+    },
+    {
+      "gap": true
+    },
+    {
+      "id": "3C",
+      "character": "FRED",
+      "actor": "Actor Name"
+    },
+    {
+      "id": "4C",
+      "character": "LEO",
+      "actor": "Actor Name"
+    }
+  ]
 }

@@ -4,8 +4,8 @@
 // How it behaves:
 //   * The board spends almost all of its time in deep sleep. The e-paper keeps
 //     showing the last page without using any power.
-//   * Short press of the user button: wake, show the next page (Lens -> Crew ->
-//     Notes), go back to sleep.
+//   * Short press of the button: wake, show the next page (Lens -> Cast ->
+//     Crew -> Notes), go back to sleep.
 //   * Hold the button for 3 seconds: edit mode. The board starts its own Wi-Fi
 //     network and serves an edit page to your phone. Saving updates the screen
 //     and puts the board back to sleep.
@@ -36,6 +36,7 @@ static const uint32_t EDIT_TIMEOUT_MS = 10UL * 60UL * 1000UL;  // 10 minutes
 
 static const size_t MAX_LENSES = 12;
 static const size_t MAX_CREW = 10;
+static const size_t MAX_CAST = 14;  // actors + gaps
 static const size_t MAX_NOTES_CHARS = 1500;
 static const size_t MAX_FIELD_CHARS = 40;
 
@@ -80,6 +81,22 @@ static void loadDefaults() {
     o["cf"] = l[2];
     o["d"] = "95mm";
   }
+  // Cast list ("runs and rides"). An entry with "gap": true splits groups.
+  JsonArray cast = config["cast"].to<JsonArray>();
+  const char *demoCast[][3] = {
+      {"1", "CHARACTER", "Actor Name"}, {"", "", ""},
+      {"2", "CHARACTER", "Actor Name"}, {"3", "CHARACTER", "Actor Name"},
+  };
+  for (auto &c : demoCast) {
+    JsonObject o = cast.add<JsonObject>();
+    if (!*c[0]) {
+      o["gap"] = true;
+      continue;
+    }
+    o["id"] = c[0];
+    o["character"] = c[1];
+    o["actor"] = c[2];
+  }
   JsonArray crew = config["crew"].to<JsonArray>();
   const char *demoCrew[][3] = {
       {"DP", "Your Name", "+44 7000 000000"},
@@ -94,7 +111,7 @@ static void loadDefaults() {
   }
   config["notes"] =
       "Hold the button for 3 seconds to edit this slate from your phone.\n\n"
-      "A short press flips between Lens, Crew and Notes.";
+      "A short press flips between Lens, Cast, Crew and Notes.";
 }
 
 static bool loadConfig() {
@@ -131,6 +148,19 @@ static bool sanitizeInto(JsonDocument &in, JsonDocument &out) {
     o["t"] = clip(l["t"] | "", 8);
     o["cf"] = clip(l["cf"] | "", 14);
     o["d"] = clip(l["d"] | "", 10);
+  }
+
+  JsonArray castOut = out["cast"].to<JsonArray>();
+  for (JsonObject c : in["cast"].as<JsonArray>()) {
+    if (castOut.size() >= MAX_CAST) break;
+    JsonObject o = castOut.add<JsonObject>();
+    if (c["gap"] | false) {
+      o["gap"] = true;
+      continue;
+    }
+    o["id"] = clip(c["id"] | "", 4);
+    o["character"] = clip(c["character"] | "", 24);
+    o["actor"] = clip(c["actor"] | "", MAX_FIELD_CHARS);
   }
 
   JsonArray crewOut = out["crew"].to<JsonArray>();
